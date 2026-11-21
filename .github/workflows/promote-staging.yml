@@ -1,0 +1,36 @@
+name: Promote to staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Cloud Deploy release name to promote"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOYER_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Promote release to staging
+        run: |
+          gcloud deploy targets promote \
+            --release="${{ inputs.release }}" \
+            --delivery-pipeline="cloud-run-app" \
+            --region="${{ vars.GCP_REGION }}" \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --target="staging"

@@ -1,0 +1,42 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: cloud-run-app
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/startup-cpu-boost: "true"
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+    spec:
+      serviceAccountName: cloud-run-app-runtime
+      containerConcurrency: 80
+      timeoutSeconds: 30
+      containers:
+        - name: app
+          image: us-docker.pkg.dev/project/repo/app:placeholder
+          ports:
+            - name: http1
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            failureThreshold: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            failureThreshold: 3
+            periodSeconds: 10
+          env:
+            - name: APP_ENVIRONMENT
+              value: dev
+            - name: APP_VERSION
+              value: dev
