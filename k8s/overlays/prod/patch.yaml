@@ -1,15 +1,15 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: cloud-run-app
-spec:
-  template:
-    metadata:
-      annotations:
-        autoscaling.knative.dev/minScale: "3"
-    spec:
-      containers:
-        - name: app
-          env:
-            - name: APP_ENVIRONMENT
-              value: prod
+- op: replace
+  path: /metadata/name
+  value: cloud-run-app-prod
+- op: replace
+  path: /spec/template/metadata/annotations/autoscaling.knative.dev~1minScale
+  value: "2"
+- op: add
+  path: /spec/template/metadata/annotations/autoscaling.knative.dev~1maxScale
+  value: "10"
+- op: replace
+  path: /spec/template/spec/serviceAccountName
+  value: cloud-run-app-prod-runtime
+- op: replace
+  path: /spec/template/spec/containers/0/env/0/value
+  value: prod

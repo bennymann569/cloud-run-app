@@ -127,6 +127,17 @@ The staging and production workflows use `workflow_dispatch`, so they do not run
 
 The same immutable image progresses through all environments. It is not rebuilt for staging or production.
 
+The dev deployment checks out the exact commit that passed CI, so the image and
+the Skaffold/Kustomize manifests used to create its release come from the same
+revision. Cloud Run services and runtime service accounts are environment
+specific and match the Terraform names:
+
+| Environment | Cloud Run service | Runtime service account | Min/max instances |
+|---|---|---|---|
+| dev | `cloud-run-app-dev` | `cloud-run-app-dev-runtime` | 1 / 3 |
+| staging | `cloud-run-app-staging` | `cloud-run-app-staging-runtime` | 1 / 5 |
+| prod | `cloud-run-app-prod` | `cloud-run-app-prod-runtime` | 2 / 10 |
+
 ## First deployment
 
 Before the first application deployment, ensure the infrastructure repository has been applied and the initial bootstrap image exists in Artifact Registry.

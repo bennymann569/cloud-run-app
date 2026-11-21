@@ -21,6 +21,8 @@ jobs:
     environment: dev
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
@@ -30,3 +32,5 @@ jobs:
         run: |
           IMAGE="${{ vars.ARTIFACT_REGISTRY }}/cloud-run-app:${{ github.event.workflow_run.head_sha }}"
           bash clouddeploy/release.sh dev "${IMAGE}"
+        env:
+          SOURCE_COMMIT: ${{ github.event.workflow_run.head_sha }}

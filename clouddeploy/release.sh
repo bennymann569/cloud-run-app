@@ -6,7 +6,7 @@ REGION="${GCP_REGION:?GCP_REGION is required}"
 PIPELINE="${CLOUD_DEPLOY_PIPELINE:-cloud-run-app}"
 TARGET="${1:?Usage: release.sh <dev|staging|prod> <image-uri>}"
 IMAGE="${2:?Usage: release.sh <dev|staging|prod> <image-uri>}"
-COMMIT_SHA="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+COMMIT_SHA="${SOURCE_COMMIT:-${GITHUB_SHA:-$(git rev-parse HEAD)}}"
 RELEASE_NAME="rel-${COMMIT_SHA:0:12}-$(date +%Y%m%d%H%M%S)"
 
 gcloud deploy releases create "${RELEASE_NAME}" \
